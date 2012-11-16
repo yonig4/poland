@@ -13,11 +13,14 @@
 		.tr:nth-child(5n)>span{border-bottom-color:orange;}
 		span:nth-child(5n){ border-right-color:orange; }
 		img{position:absolute; left:0; top:460px;}
+		#graveInfo{text-align:center; width:250px; position:fixed; right:50px; top:50px; border:10px inset grey;}
+		#graveInfoStorage{display:none;}
 	</style>
 </head>
 <body>
 <img src='map1.png'>
-<div style='text-align:center; width:250px'>
+<div id='graveInfo'></div>
+<div id='graveInfoStorage'>
 	<p rel='3.1'>פנ הילדה גולדה רבקה<br>בת</p>
 	<p rel='5.1'>...ונחמדה<br>...תמימה מבריינדל<br>(בת) שמואל משה ונפטר<br>כו תמוז בשנת תרלד</p>
 	<p rel='5.4'>פט<br>אשה חשובה וצנועה<br>במעשי מרט רבקה<br>בת מו' שלמה זלמן ז"ל</p>
@@ -74,7 +77,7 @@
 	<p rel='1.3A'>אשה צנועה <br>מ פינקל פייגא<br>בת מ יחזקאל<br>שמואל יצו<br>עשק א אב תקצד</p>
 	<p rel='2.1A'>או על שבר <br>פטירת אבינו אדונינו ורבינוWEST<br>כל ימיו קורה צדק לעזרו<br>סביר תמיו עד יציאת נשמתו<br>נמנה תמיד לחבורה ישירה<br>האגר ... קרז התורה ל...<br>הר מי תלמידים ופניתם כלפ...<br>הה מזה אלכסנדר פנדר<br>אברהם בן מוה ר מרדכי ז"ל ...<br>..........</p>
 </div>
-
+<div id='noInfo'>Headstone could not be read.</div>
 <script type="text/javascript" src='moo.145.js'></script>
 
 <script>
@@ -116,16 +119,30 @@
 
     // Create marker foreground
     i = 0;
+    var grave   = document.id('graveInfo')
+      , noInfo  = document.id('noInfo')
+      , infoEls = document.id('graveInfoStorage');
+    
     var marker = new Element('div.markers');
     var size = table.getSize();
     var H = $$('span')[0].getSize().y;
+   
     coords.each(function(row){
         ++i; var n=0;
         row.each(function(yx){
-           var loc = {top:size.y - (yx[0] * H), left: (yx[1] * H) - H};
-            new Element('div',{text:i +':'+ ++n, styles:loc}).inject(marker).addEvents(
-                { 'mouseover':function(e){this.setStyle('z-index',1)}
-                , 'mouseout':function(){this.setStyle('z-index',0)}  
+			var num = i +'.'+ ++n
+			  , loc = {top:size.y - (yx[0] * H), left: (yx[1] * H) - H}
+			  , infoEl = infoEls.getElement('p[rel='+num+']');
+
+			new Element('div',{text:num, styles:loc}).inject(marker).addEvents(
+                { 'mouseover':function(e){
+                	this.setStyle('z-index',1);
+                	grave.empty().adopt(infoEl || noInfo);
+                	}
+                , 'mouseout':function(){
+                	this.setStyle('z-index',0);
+                	grave.empty();
+                	}  
                 , 'mousedown':function(){this.setStyle('opacity',0.2)}  
                 , 'mouseup':function(){this.setStyle('opacity',1)}  
                 });
